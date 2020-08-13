@@ -2,7 +2,7 @@
 Generic system to perform streaming transformations on histograms
 
 Features:
-* core does not depend on any histogram library or input/output format; plugins can be written. Main assumption is that the histograms live in a hierarchical namespace.
+* core does not depend on any histogram library or input/output format; plugins can be written (and these need not live in this package). Probably most useful if histograms live in a hierarchical namespace but this is not necessary. Example implementation to read/write ROOT files provided.
 * intended for streaming, e.g. for online environments where histograms are updated asynchronously.
 * pattern matching makes it easy to apply the same transformation to multiple histograms
 * no code needed to configure
