@@ -7,7 +7,7 @@ Features:
 * pattern matching makes it easy to apply the same transformation to multiple histograms
 * no code needed to configure
 
-This is still very much early-release software, you can test it on lxplus as follows:
+This is still very much early-release software, you can test it as follows (e.g. should work on lxplus, if you have a CERN account):
 * set up ROOT and Python (>=3.6) in a way that you like. For ATLAS people you can set up a master nightly.
 * install: `python3 -m pip install --extra-index-url https://test.pypi.org/simple/ -U --user histgrinder`
 * prepare a sample ROOT file: `python3 -m histgrinder.make_sample_file`
