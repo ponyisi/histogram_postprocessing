@@ -1,5 +1,6 @@
 # Configuration utilities
 from typing import Union, IO, List, Any
+import logging
 
 class TransformationConfiguration(object):
     def __init__(self, Input, Output, Function, Description, Parameters={}):
@@ -25,9 +26,10 @@ def read_configuration(f: Union[str, IO]) -> List[TransformationConfiguration]:
         try:
             rv.append(TransformationConfiguration(**doc))
         except TypeError as e:
-            print("Unable to understand the following configuration:")
-            print(doc)
-            print(f"Error message: {e}")
+            log = logging.getLogger(__name__)
+            log.error("Unable to understand the following configuration:")
+            log.error(doc)
+            log.error(f"Error message: {e}")
     return rv
 
 def lookup_name(name: str) -> Any:

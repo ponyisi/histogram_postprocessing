@@ -1,3 +1,4 @@
 # 
-#from .ROOTFileIO import ROOTInputModule
-#__all__ = ['ROOTInputModule']
+
+import logging
+logging.getLogger(__name__).addHandler(logging.NullHandler())

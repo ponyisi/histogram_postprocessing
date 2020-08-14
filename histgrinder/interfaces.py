@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Mapping, Collection, Any, Iterable
+from typing import Mapping, Collection, Any, Iterable, Union
 from .HistObject import HistObject
 
 # Interface for modules that read histograms from a source
@@ -25,6 +25,10 @@ class OutputModule(ABC):
         return
 
     @abstractmethod
-    def publish(self, obj: HistObject) -> None:
+    def publish(self, obj: Union[HistObject, Iterable[HistObject]]) -> None:
         """ Publish the histogram. """
+        return
+
+    @abstractmethod
+    def finalize(self) -> None:
         return

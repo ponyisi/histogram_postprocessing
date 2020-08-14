@@ -31,11 +31,10 @@ class Transformer(object):
             match = regex.match(obj.name)
             if match:
                 self.hits[ire][match.groups()] = obj
-                # print("I see a match with index", ire, "and groups", match.groups())
                 break
         if match is None:
             return None
-        # Return value
+        # Return value list
         rv = []
         # Given a match, what first position histograms match?
         firstmatches = []
@@ -47,22 +46,16 @@ class Transformer(object):
             if success:
                 firstmatches.append(tup)
         # finally, figure out all matching patterns across multiple input positions 
-        # print("Hits?", self.hits)
         for tup in firstmatches:
-            # print("Tuple", tup)
             matchdict = dict(zip(self.regextupnames[0], tup))
             matchlist = [[tup]]
             for idx in range(1, self.inlength):
                 matchlist.append([])
                 for tup2 in self.hits[idx]:
-                    # print("Index", idx, "Tup2", tup2)
-                    # print('Matchdict', matchdict, tup2, self.regexgroups[0])
                     if all(v == tup[self.regexgroups[0][self.regextupnames[idx][i]]-1] 
                           for i, v in enumerate(tup2)):
                         matchlist[-1].append(tup2)
-            # print("Matchlist", matchlist)
             for arg in product(*matchlist):
-                # print('Product?', arg)
                 olist = self.transform_function([self.hits[i][v].hist for i, v in enumerate(arg)],
                                                 self.tc.parameters,
                                                 matchdict)

@@ -1,31 +1,38 @@
 from ..interfaces import InputModule, OutputModule
 from ..HistObject import HistObject
-from typing import Union, Iterable
+from typing import Union, Iterable, Mapping, Any, Collection, Pattern, Generator
+import logging
 
 class ROOTInputModule(InputModule):
     def __init__(self):
         self.source = None
         import ROOT
+        # allow for us to close the input file and keep the histograms live
         ROOT.TH1.AddDirectory(ROOT.kFALSE)
-
-    def configure(self, options):
-        if 'source' not in options:
-            raise ValueError("Must specify 'source' as an option to ROOTInputModule")
-        self.source = options['source']
-        # print('prefix?', options)
-        self.prefix = options.get('prefix', '/')
         self.classwarnings = set()
         self.selectors = None
 
-    def setSelectors(self, selectors):
+    def configure(self, options: Mapping[str, Any]) -> None:
+        """ 
+        Configure this module. Potential elements of "options":
+        source: should be a ROOT-openable filename or URL.
+        prefix: directory path to search under. Returned histogram names will not include this.
+        """
+        if 'source' not in options:
+            raise ValueError("Must specify 'source' as an option to ROOTInputModule")
+        self.source = options['source']
+        self.prefix = options.get('prefix', '/')
+
+    def setSelectors(self, selectors: Collection[Pattern]) -> None:
         """ Do more later """
         self.selectors = selectors
 
-    def iterate(self):
+    def iterate(self) -> Generator[HistObject, None, None]:
         """ Open ROOT file; iterate over all histograms; close ROOT file """
         import ROOT
         import os.path
         from collections import deque
+        log = logging.getLogger(__name__)
         infile = ROOT.TFile.Open(self.source)
         if not infile:
             raise ValueError(f"Unable to open input file {self.source}")
@@ -33,9 +40,8 @@ class ROOTInputModule(InputModule):
         while dirqueue:
             dirname = dirqueue.popleft()
             indir = infile.GetDirectory(os.path.join(self.prefix, dirname))
-            # print(self.prefix + dirname)
             if not indir:
-                print(f"Access to invalid directory. This shouldn't happen ... dirname {dirname}") 
+                log.critical(f"Access to invalid directory. This shouldn't happen ... dirname {dirname}") 
                 continue
             for k in indir.GetListOfKeys():
                 classname = k.GetClassName()
@@ -50,8 +56,8 @@ class ROOTInputModule(InputModule):
                         continue
                     else:
                         self.classwarnings.add(classname)
-                        print(f"{k.GetName()} is of type {classname} and cannot be considered, for now")
-                        print(f"Future warnings for type {classname} will be suppressed")
+                        log.warning(f"{k.GetName()} is of type {classname} and cannot be considered, for now")
+                        log.warning(f"Future warnings for type {classname} will be suppressed")
                         continue
                 objname = os.path.join(dirname, k.GetName())
                 if self.selectors is not None:
@@ -60,18 +66,25 @@ class ROOTInputModule(InputModule):
                 obj = k.ReadObj()
                 if hasattr(obj, 'SetDirectory'):
                     obj.SetDirectory(0)
-                # print('yielding', os.path.join(dirname, k.GetName()))
+                log.debug(f'ROOT input read {os.path.join(dirname, k.GetName())}')
                 yield HistObject(os.path.join(dirname, k.GetName()), obj)
         infile.Close()
 
-    def __iter__(self):
+    def __iter__(self) -> Iterable[HistObject]:
         return self.iterate()
         
 class ROOTOutputModule(OutputModule):
     def __init__(self):
         self.target = None
 
-    def configure(self, options) -> None:
+    def configure(self, options: Mapping[str, Any]) -> None:
+        """ 
+        Configure this module. Potential elements of "options":
+        target: should be a ROOT-openable filename or URL which can be opened for writing.
+        prefix: directory path to place results under.
+        overwrite: boolean to indicate whether results should overwrite existing histograms in the file.
+        delay: only write histograms in finalize() (not during publish()).
+        """
         if 'target' not in options:
             raise ValueError("Must specify 'target' as an option to ROOTInputModule")
         self.target = options['target']
@@ -81,6 +94,7 @@ class ROOTOutputModule(OutputModule):
         self.queue = set()
 
     def publish(self, obj: Union[HistObject, Iterable[HistObject]]) -> None:
+        """ Accepts a HistObject containing a ROOT object to write to file """
         if isinstance(obj, HistObject):
             obj = [obj]
         if self.delay:
@@ -95,34 +109,25 @@ class ROOTOutputModule(OutputModule):
         import ROOT
         import os.path
         if not self.queue: return # Nothing to do
+        log = logging.getLogger(__name__)
         outfile = ROOT.TFile.Open(self.target, 'UPDATE')
         for o in self.queue:
-            # print("publishing", o)
+            log.debug(f"ROOT output: publishing {o}")
             fulltargetname = os.path.join(self.prefix, o.name)
             dirtargetname = os.path.dirname(fulltargetname)
             if isinstance(o.hist, ROOT.TObject):
                 if not outfile.GetDirectory(dirtargetname):
-                    # print("Trying to create", dirtargetname)
                     outfile.mkdir(dirtargetname if dirtargetname[0] != '/'
                                   else dirtargetname[1:])
                 d = outfile.GetDirectory(dirtargetname)
-                # d.cd()
-                # print(d)
-                # o.hist.SetName(os.path.basename(fulltargetname))
-                # o.hist.Write()#,
-#                                ROOT.TObject.kWriteDelete if self.overwrite else 0)
-                # outfile.cd()
-                # o.hist.SetName(os.path.basename(fulltargetname))
-                # d.Append(o.hist, True)
-                # d.Write()
                 d.WriteTObject(o.hist, os.path.basename(fulltargetname),
                                "WriteDelete" if self.overwrite else "")
-                # outfile.WriteTObject(o.hist, o.name, "WriteDelete" if self.overwrite else "")
             else:
-                print("Unsupported object type", type(o.hist).__name__)
+                log.error(f"ROOT output: unsupported object type {type(o.hist).__name__}")
         outfile.Close()
 
     def finalize(self) -> None:
+        """ Writes outstanding HistObjects to file """
         self._write()
 
 if __name__ == '__main__':

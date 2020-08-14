@@ -1,4 +1,7 @@
 def go():
+    """ Application entry point """
+    import logging
+
     from histgrinder.config import read_configuration, lookup_name
     from histgrinder.transform import Transformer
 
@@ -14,9 +17,14 @@ def go():
     parser.add_argument('--outmodule', default='histgrinder.io.root.ROOTOutputModule',
                         help='Python class which implements an output module')
     parser.add_argument('--prefix', help='Prefix to ignore in histogram locations')
+    parser.add_argument('--loglevel', help='Set the logging level',
+                        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+                        default='INFO')
     args = parser.parse_args()
 
-    print("Histgrinder: histogram postprocessor")
+    logging.basicConfig(level=args.loglevel, format='%(asctime)s | %(name)s | %(levelname)s | %(message)s')
+    log = logging.getLogger(__name__)
+    log.info("Histgrinder: histogram postprocessor")
 
     # read configuration & set up transformations
     transformers = []
@@ -43,14 +51,14 @@ def go():
     om.configure(out_configuration)
 
     # Event loop
-    print("Beginning loop")
+    log.info("Beginning loop")
     for obj in im:
         for _ in transformers:
             v = _.consider(obj)
             if v:
                 om.publish(v)
 
-    print("Complete")
+    log.info("Complete")
 
 if __name__ == '__main__':
     go()
