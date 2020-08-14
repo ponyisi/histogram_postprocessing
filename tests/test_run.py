@@ -10,7 +10,7 @@ def test_run():
                          shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     print(chk.stdout)
     chk.check_returncode()
-    chk = subprocess.run("wget https://raw.githubusercontent.com/ponyisi/histogram_postprocessing/master/resources/example.yaml",  #noqa: E501
+    chk = subprocess.run("wget https://raw.githubusercontent.com/ponyisi/histogram_postprocessing/master/resources/example.yaml",  # noqa: E501
                          shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     print(chk.stdout)
     chk.check_returncode()

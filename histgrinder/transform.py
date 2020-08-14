@@ -5,7 +5,8 @@ from typing import Optional, List
 
 class Transformer(object):
     def __init__(self, tc: TransformationConfiguration):
-        import re, string
+        import re
+        import string
         self.tc = tc
         # the number of histograms needed for a match
         self.inlength = len(tc.input)
@@ -21,7 +22,7 @@ class Transformer(object):
         self.regextupnames = [tuple(_) for _ in self.regexgroups]
 
         # group names that appear in outputs
-        self.outputnames = set().union(*[[_[1] for _ in string.Formatter().parse(output)] 
+        self.outputnames = set().union(*[[_[1] for _ in string.Formatter().parse(output)]
                                          for output in self.tc.output])
 
         # one dictionary for each input slot
@@ -36,7 +37,6 @@ class Transformer(object):
 
     def consider(self, obj: HistObject, dryrun: bool = False) -> Optional[List[HistObject]]:
         """ Emit a new plot if we get a full match, otherwise None """
-        from itertools import product
         import logging
         log = logging.getLogger(__name__)
         log.debug(self.tc.description)
@@ -74,7 +74,7 @@ class Transformer(object):
             # where the variable is significant (we would output a different plot)?
             # make sure we handle the 1-indexing of regex matches
             if all(tup[self.regexgroups[0][_[0]]-1] == _[1]
-                   for _ in match.groupdict().items() 
+                   for _ in match.groupdict().items()
                    if _[0] in self.outputnames):
                 firstmatches.append(tup)
         return firstmatches
@@ -110,7 +110,7 @@ class HistCombinationIterable(object):
     def _getpair(self, tup):
         t = self.transform
         matchdict = dict(zip(t.regextupnames[0], tup))
-        matchlist=[[tup]]
+        matchlist = [[tup]]
         for idx in range(1, t.inlength):
             matchlist.append([])
             for tup2 in t.hits[idx]:
@@ -135,4 +135,3 @@ def _fullyvalid(hci: HistCombinationIterable) -> bool:
         if any(_ is None for _ in o[1]):
             return False
     return hasany
-

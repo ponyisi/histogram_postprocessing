@@ -5,6 +5,15 @@ from typing import (Union, Iterable, Mapping, Any, Collection,
 import logging
 
 
+def readobj(k, dryrun):
+    if not dryrun:
+        obj = k.ReadObj()
+        if hasattr(obj, 'SetDirectory'):
+            obj.SetDirectory(0)
+    else:
+        obj = None
+
+
 class ROOTInputModule(InputModule):
     def __init__(self):
         self.source = None
@@ -63,12 +72,7 @@ class ROOTInputModule(InputModule):
                 if self.selectors is not None:
                     if not any(_.match(objname) for _ in self.selectors):
                         continue
-                if not dryrun:
-                    obj = k.ReadObj()
-                    if hasattr(obj, 'SetDirectory'):
-                        obj.SetDirectory(0)
-                else:
-                    obj = None
+                obj = readobj(k, dryrun)
                 log.debug('ROOT input read '
                           f'{os.path.join(dirname, k.GetName())}')
                 yield HistObject(os.path.join(dirname, k.GetName()), obj)
@@ -88,6 +92,7 @@ class ROOTInputModule(InputModule):
 
     def warmup(self) -> Iterable[HistObject]:
         return self.iterate(dryrun=True)
+
 
 class ROOTOutputModule(OutputModule):
     def __init__(self):

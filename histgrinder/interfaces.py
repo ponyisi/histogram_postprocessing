@@ -31,7 +31,6 @@ class InputModule(ABC):
         return None
 
 
-
 # Interface for modules that write histograms to a sink
 class OutputModule(ABC):
     @abstractmethod
