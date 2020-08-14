@@ -4,5 +4,5 @@ def test_run():
     if chk: return False
     chk = subprocess.run("wget https://github.com/ponyisi/histogram_postprocessing/blob/master/resources/example.yaml")
     if chk: return False
-    chk = subprocess.run('python3 -m histgrinder.engine example.root example.root -c example.yaml --prefix prefix")
+    chk = subprocess.run("python3 -m histgrinder.engine example.root example.root -c example.yaml --prefix prefix")
     return chk == 0
