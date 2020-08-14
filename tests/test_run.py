@@ -1,4 +1,10 @@
 def test_run():
+    try:
+        import ROOT
+    except ImportError:
+        print("ROOT not available, aborting test")
+        return True
+
     import subprocess
     chk = subprocess.run("python -m histgrinder.make_sample_file",
                          shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
