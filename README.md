@@ -9,10 +9,10 @@ Features:
 
 This is still very much early-release software, you can test it as follows (e.g. should work on lxplus, if you have a CERN account):
 * set up ROOT and Python (>=3.6) in a way that you like. For ATLAS people you can set up a master nightly.
-* install: `python3 -m pip install --extra-index-url https://test.pypi.org/simple/ -U --user histgrinder`
+* install: `python3 -m pip install --extra-index-url https://test.pypi.org/simple/ -U --user histgrinder==0.1.1`
 * prepare a sample ROOT file: `python3 -m histgrinder.make_sample_file`
 * download an example YAML configuration from https://raw.githubusercontent.com/ponyisi/histogram_postprocessing/master/resources/example.yaml 
 * run. The following will postprocess `example.root`, created above, according to the `example.yaml` configuration, ignoring the top-level path "prefix", then add the outputs to `example.root`: 
 
 `python3 -m histgrinder.engine example.root example.root -c example.yaml --prefix prefix`
-* the transformation above will divide the prefix/gaussians/gaus_2x and prefix/gaussians/gaus_3x histograms by the prefix/gaussians/gaus_5x histogram (matching x between them) and write the output to prefix/gauDiv_2x or prefix/gauDiv_3x. So 20 different histogram divisions are configured with one config block.
+* the transformation above will perform a number of operations on the histograms of the input file. For example, 20 different histogram divisions are configured with the first config block.
