@@ -57,15 +57,8 @@ class ROOTInputModule(InputModule):
                 if not (klass.InheritsFrom('TH1')
                         or klass.InheritsFrom('TGraph')
                         or klass.InheritsFrom('TEfficiency')):
-                    if classname in self.classwarnings:
-                        continue
-                    else:
-                        self.classwarnings.add(classname)
-                        log.warning(f"{k.GetName()} is of type {classname} "
-                                    "and cannot be considered, for now")
-                        log.warning(f"Future warnings for type {classname} "
-                                    "will be suppressed")
-                        continue
+                    self._classwarning(k, classname, log)
+                    continue
                 objname = os.path.join(dirname, k.GetName())
                 if self.selectors is not None:
                     if not any(_.match(objname) for _ in self.selectors):
@@ -77,6 +70,15 @@ class ROOTInputModule(InputModule):
                           f'{os.path.join(dirname, k.GetName())}')
                 yield HistObject(os.path.join(dirname, k.GetName()), obj)
         infile.Close()
+
+    def _classwarning(self, key, classname, log) -> None:
+        """ Log warning for unhandled class """
+        if classname not in self.classwarnings:
+            self.classwarnings.add(classname)
+            log.warning(f"{key.GetName()} is of type {classname} "
+                        "and cannot be considered, for now")
+            log.warning(f"Future warnings for type {classname} "
+                        "will be suppressed")
 
     def __iter__(self) -> Iterable[HistObject]:
         return self.iterate()

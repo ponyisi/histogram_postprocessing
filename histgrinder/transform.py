@@ -43,14 +43,7 @@ class Transformer(object):
         # Return value list
         rv = []
         # Given a match, what first position histograms match?
-        firstmatches = []
-        for tup in self.hits[0]:
-            # does the tuple match in all spots where the pattern name matches?
-            # correct for 1-indexing of regex matches
-            success = all(tup[self.regexgroups[0][_[0]]-1] == _[1]
-                          for _ in match.groupdict().items())
-            if success:
-                firstmatches.append(tup)
+        firstmatches = self._getMatchingFirstHists(match)
         # finally, figure out all matching patterns across
         # multiple input positions
         for tup in firstmatches:
@@ -71,3 +64,13 @@ class Transformer(object):
                     rv.append(HistObject(self.tc.output[i].format(**matchdict),
                                          ohist))
         return rv
+
+    def _getMatchingFirstHists(self, match):
+        firstmatches = []
+        for tup in self.hits[0]:
+            # does the tuple match in all spots where the pattern name matches?
+            # correct for 1-indexing of regex matches
+            if all(tup[self.regexgroups[0][_[0]]-1] == _[1]
+                   for _ in match.groupdict().items()):
+                firstmatches.append(tup)
+        return firstmatches
