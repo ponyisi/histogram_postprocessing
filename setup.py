@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="histgrinder",
-    version="1.0.0",
+    version="0.1.1",
     author="Peter Onyisi",
     author_email="ponyisi@utexas.edu",
     description="Generic system to perform streaming transformations on histograms",
