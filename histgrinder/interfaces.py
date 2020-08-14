@@ -21,6 +21,16 @@ class InputModule(ABC):
     def __iter__(self) -> Iterable[HistObject]:
         return None
 
+    @abstractmethod
+    def warmup(self) -> Iterable[HistObject]:
+        """
+        Should return an iterable that behaves the same as normal iteration,
+        except with HistObject.hist = None (histograms not actually read).
+        This permits code to figure out the structure of the histogram file.
+        """
+        return None
+
+
 
 # Interface for modules that write histograms to a sink
 class OutputModule(ABC):

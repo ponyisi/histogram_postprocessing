@@ -1,8 +1,25 @@
 # Separate blocks with ---
 ---
+# This function takes the ratio of some histograms
 Input: [ 'gaussians/gaus_(?P<id0>[23])(?P<id>\d)', 'gaussians/gaus_5(?P<id>\d)' ]
 Output: [ 'gauDiv_{id0}{id}' ]
-Function: histgrinder.example.transform_function_test_ROOT
+Function: histgrinder.example.transform_function_divide_ROOT
 #Here is how you would pass parameters
 #Parameters: { variable: eta, binedges: [-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,2.5] }
-Description: Testing
+Description: Testing1
+---
+# This function sums the ratio of some histograms
+Input: [ 'gaussians/gaus_(?P<id0>\d)(?P<id>\d)', 'gaussians/gaus_(?P<id0>\d)(?P<id>\d)' ]
+Output: [ 'gauDiv2_{id0}' ]
+Function: histgrinder.example.transform_function_divide2_ROOT
+#Here is how you would pass parameters
+#Parameters: { variable: eta, binedges: [-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,2.5] }
+Description: Testing2
+---
+# This function combines multiple histograms into one
+Input: [ 'gaussians/gaus_(?P<id>\d+)' ]
+Output: [ 'gauRMS' ]
+Function: histgrinder.example.transform_function_rms_ROOT
+#Here is how you would pass parameters
+#Parameters: { variable: eta, binedges: [-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,2.5] }
+Description: Testing3

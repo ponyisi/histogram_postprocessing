@@ -31,7 +31,7 @@ class ROOTInputModule(InputModule):
         """ Do more later """
         self.selectors = selectors
 
-    def iterate(self) -> Generator[HistObject, None, None]:
+    def iterate(self, dryrun) -> Generator[HistObject, None, None]:
         """ Open ROOT file; iterate over all histograms; close ROOT file """
         import ROOT
         import os.path
@@ -63,9 +63,12 @@ class ROOTInputModule(InputModule):
                 if self.selectors is not None:
                     if not any(_.match(objname) for _ in self.selectors):
                         continue
-                obj = k.ReadObj()
-                if hasattr(obj, 'SetDirectory'):
-                    obj.SetDirectory(0)
+                if not dryrun:
+                    obj = k.ReadObj()
+                    if hasattr(obj, 'SetDirectory'):
+                        obj.SetDirectory(0)
+                else:
+                    obj = None
                 log.debug('ROOT input read '
                           f'{os.path.join(dirname, k.GetName())}')
                 yield HistObject(os.path.join(dirname, k.GetName()), obj)
@@ -81,8 +84,10 @@ class ROOTInputModule(InputModule):
                         "will be suppressed")
 
     def __iter__(self) -> Iterable[HistObject]:
-        return self.iterate()
+        return self.iterate(dryrun=False)
 
+    def warmup(self) -> Iterable[HistObject]:
+        return self.iterate(dryrun=True)
 
 class ROOTOutputModule(OutputModule):
     def __init__(self):

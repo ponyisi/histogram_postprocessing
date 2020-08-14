@@ -56,6 +56,12 @@ def go():
         out_configuration['prefix'] = args.prefix
     om.configure(out_configuration)
 
+    # Warmup
+    log.info("Warmup")
+    for obj in im.warmup():
+        for _ in transformers:
+            v = _.consider(obj)
+
     # Event loop
     log.info("Beginning loop")
     for obj in im:
