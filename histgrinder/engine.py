@@ -9,20 +9,26 @@ def go():
     from argparse import ArgumentParser
 
     parser = ArgumentParser(description="Histogram postprocessing script")
-    parser.add_argument('-c', '--configfile', nargs='+', help='YAML configuration file(s)')
+    parser.add_argument('-c', '--configfile', nargs='+',
+                        help='YAML configuration file(s)')
     parser.add_argument('source', help='Input source, e.g. ROOT file')
     parser.add_argument('target', help='Output target, e.g. ROOT file')
-    parser.add_argument('--inmodule', default='histgrinder.io.root.ROOTInputModule',
+    parser.add_argument('--inmodule',
+                        default='histgrinder.io.root.ROOTInputModule',
                         help='Python class which implements an input module')
-    parser.add_argument('--outmodule', default='histgrinder.io.root.ROOTOutputModule',
+    parser.add_argument('--outmodule',
+                        default='histgrinder.io.root.ROOTOutputModule',
                         help='Python class which implements an output module')
-    parser.add_argument('--prefix', help='Prefix to ignore in histogram locations')
+    parser.add_argument('--prefix',
+                        help='Prefix to ignore in histogram locations')
     parser.add_argument('--loglevel', help='Set the logging level',
-                        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+                        choices=['DEBUG', 'INFO', 'WARNING',
+                                 'ERROR', 'CRITICAL'],
                         default='INFO')
     args = parser.parse_args()
 
-    logging.basicConfig(level=args.loglevel, format='%(asctime)s | %(name)s | %(levelname)s | %(message)s')
+    logging.basicConfig(level=args.loglevel,
+                        format='%(asctime)s | %(name)s | %(levelname)s | %(message)s')  # noqa: E501
     log = logging.getLogger(__name__)
     log.info("Histgrinder: histogram postprocessor")
 
@@ -59,6 +65,7 @@ def go():
                 om.publish(v)
 
     log.info("Complete")
+
 
 if __name__ == '__main__':
     go()

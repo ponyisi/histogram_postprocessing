@@ -1,12 +1,16 @@
 from abc import ABC, abstractmethod
-from typing import Mapping, Collection, Any, Iterable, Union
+from typing import Mapping, Collection, Iterable, Union
 from .HistObject import HistObject
+
 
 # Interface for modules that read histograms from a source
 class InputModule(ABC):
     @abstractmethod
     def configure(self, options: Mapping) -> None:
-        """Called to configure the module. Definition is up to specific implementation."""
+        """
+        Called to configure the module. Definition is up to specific
+        implementation.
+        """
         return
 
     @abstractmethod
@@ -16,6 +20,7 @@ class InputModule(ABC):
     @abstractmethod
     def __iter__(self) -> Iterable[HistObject]:
         return None
+
 
 # Interface for modules that write histograms to a sink
 class OutputModule(ABC):

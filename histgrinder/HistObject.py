@@ -1,5 +1,6 @@
 from typing import Any
 
+
 # Object to hold histogram name & object
 class HistObject(object):
     def __init__(self, name: str, hist: Any):
@@ -8,4 +9,3 @@ class HistObject(object):
 
     def __str__(self):
         return f"{type(self.hist).__name__} object {self.name}"
-

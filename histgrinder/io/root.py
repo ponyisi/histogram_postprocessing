@@ -1,7 +1,9 @@
 from ..interfaces import InputModule, OutputModule
 from ..HistObject import HistObject
-from typing import Union, Iterable, Mapping, Any, Collection, Pattern, Generator
+from typing import (Union, Iterable, Mapping, Any, Collection,
+                    Pattern, Generator)
 import logging
+
 
 class ROOTInputModule(InputModule):
     def __init__(self):
@@ -13,13 +15,15 @@ class ROOTInputModule(InputModule):
         self.selectors = None
 
     def configure(self, options: Mapping[str, Any]) -> None:
-        """ 
+        """
         Configure this module. Potential elements of "options":
         source: should be a ROOT-openable filename or URL.
-        prefix: directory path to search under. Returned histogram names will not include this.
+        prefix: directory path to search under. Returned histogram names
+            will not include this.
         """
         if 'source' not in options:
-            raise ValueError("Must specify 'source' as an option to ROOTInputModule")
+            raise ValueError("Must specify 'source' as an "
+                             "option to ROOTInputModule")
         self.source = options['source']
         self.prefix = options.get('prefix', '/')
 
@@ -41,7 +45,8 @@ class ROOTInputModule(InputModule):
             dirname = dirqueue.popleft()
             indir = infile.GetDirectory(os.path.join(self.prefix, dirname))
             if not indir:
-                log.critical(f"Access to invalid directory. This shouldn't happen ... dirname {dirname}") 
+                log.critical("Access to invalid directory. "
+                             f"This shouldn't happen ... dirname {dirname}")
                 continue
             for k in indir.GetListOfKeys():
                 classname = k.GetClassName()
@@ -56,8 +61,10 @@ class ROOTInputModule(InputModule):
                         continue
                     else:
                         self.classwarnings.add(classname)
-                        log.warning(f"{k.GetName()} is of type {classname} and cannot be considered, for now")
-                        log.warning(f"Future warnings for type {classname} will be suppressed")
+                        log.warning(f"{k.GetName()} is of type {classname} "
+                                    "and cannot be considered, for now")
+                        log.warning(f"Future warnings for type {classname} "
+                                    "will be suppressed")
                         continue
                 objname = os.path.join(dirname, k.GetName())
                 if self.selectors is not None:
@@ -66,27 +73,32 @@ class ROOTInputModule(InputModule):
                 obj = k.ReadObj()
                 if hasattr(obj, 'SetDirectory'):
                     obj.SetDirectory(0)
-                log.debug(f'ROOT input read {os.path.join(dirname, k.GetName())}')
+                log.debug('ROOT input read '
+                          f'{os.path.join(dirname, k.GetName())}')
                 yield HistObject(os.path.join(dirname, k.GetName()), obj)
         infile.Close()
 
     def __iter__(self) -> Iterable[HistObject]:
         return self.iterate()
-        
+
+
 class ROOTOutputModule(OutputModule):
     def __init__(self):
         self.target = None
 
     def configure(self, options: Mapping[str, Any]) -> None:
-        """ 
+        """
         Configure this module. Potential elements of "options":
-        target: should be a ROOT-openable filename or URL which can be opened for writing.
+        target: should be a ROOT-openable filename or URL which
+            can be opened for writing.
         prefix: directory path to place results under.
-        overwrite: boolean to indicate whether results should overwrite existing histograms in the file.
+        overwrite: boolean to indicate whether results should overwrite
+            existing histograms in the file.
         delay: only write histograms in finalize() (not during publish()).
         """
         if 'target' not in options:
-            raise ValueError("Must specify 'target' as an option to ROOTInputModule")
+            raise ValueError("Must specify 'target' as an option "
+                             "to ROOTInputModule")
         self.target = options['target']
         self.overwrite = bool(options.get('overwrite', True))
         self.prefix = options.get('prefix', '/')
@@ -108,7 +120,8 @@ class ROOTOutputModule(OutputModule):
         """ Open ROOT file; write obj; close ROOT file """
         import ROOT
         import os.path
-        if not self.queue: return # Nothing to do
+        if not self.queue:
+            return  # Nothing to do
         log = logging.getLogger(__name__)
         outfile = ROOT.TFile.Open(self.target, 'UPDATE')
         for o in self.queue:
@@ -123,12 +136,14 @@ class ROOTOutputModule(OutputModule):
                 d.WriteTObject(o.hist, os.path.basename(fulltargetname),
                                "WriteDelete" if self.overwrite else "")
             else:
-                log.error(f"ROOT output: unsupported object type {type(o.hist).__name__}")
+                log.error("ROOT output: unsupported object type "
+                          f"{type(o.hist).__name__}")
         outfile.Close()
 
     def finalize(self) -> None:
         """ Writes outstanding HistObjects to file """
         self._write()
+
 
 if __name__ == '__main__':
     import sys
