@@ -12,6 +12,7 @@ def readobj(k, dryrun):
             obj.SetDirectory(0)
     else:
         obj = None
+    return obj
 
 
 class ROOTInputModule(InputModule):
