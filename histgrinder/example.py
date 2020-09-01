@@ -32,4 +32,4 @@ def transform_function_rms_ROOT(inputs):
     plots = [_[1][0] for _ in inputs]  # all plots passed as first element of list
     for plot in plots:
         rv.Fill(plot.GetRMS())
-    return [plot]
+    return [rv]
