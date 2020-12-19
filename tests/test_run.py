@@ -22,7 +22,7 @@ def test_run():
     f = ROOT.TFile.Open("example.root")
     d = f.Get("prefix")
     # did we create new histograms?
-    assert len(d.GetListOfKeys()) == 31
+    assert len(d.GetListOfKeys()) == 33
     # correct size?
     assert f.Get("prefix/gauRMS").GetEntries() == 100
     return True
