@@ -1,9 +1,8 @@
+import pytest
+
+
 def test_run():
-    try:
-        import ROOT  # noqa: F401
-    except ImportError:
-        print("ROOT not available, aborting test")
-        return True
+    ROOT = pytest.importorskip("ROOT")
 
     import subprocess
     chk = subprocess.run("python -m histgrinder.make_sample_file",
