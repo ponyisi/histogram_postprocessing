@@ -42,9 +42,10 @@ class Transformer(object):
         log.debug(self.tc.description)
         match = None
         for ire, regex in enumerate(self.inregexes):
-            match = regex.match(obj.name)
-            if match:
-                self.hits[ire][match.groups()] = obj
+            imatch = regex.match(obj.name)
+            if imatch:
+                self.hits[ire][imatch.groups()] = obj
+                match = imatch
         if match is None:
             return None
         # Return value list

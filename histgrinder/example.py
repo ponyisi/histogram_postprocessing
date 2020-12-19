@@ -33,3 +33,9 @@ def transform_function_rms_ROOT(inputs):
     for plot in plots:
         rv.Fill(plot.GetRMS())
     return [rv]
+
+
+def nop(inputs):
+    """ This function does nothing but may be useful for debugging """
+    print(list(inputs))
+    return []
