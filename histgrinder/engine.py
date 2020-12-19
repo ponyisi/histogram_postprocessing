@@ -2,6 +2,7 @@ def go():
     """ Application entry point """
     import logging
 
+    import histgrinder
     from histgrinder.config import read_configuration, lookup_name
     from histgrinder.transform import Transformer
 
@@ -30,7 +31,7 @@ def go():
     logging.basicConfig(level=args.loglevel,
                         format='%(asctime)s | %(name)s | %(levelname)s | %(message)s')  # noqa: E501
     log = logging.getLogger(__name__)
-    log.info("Histgrinder: histogram postprocessor")
+    log.info(f"Histgrinder {histgrinder.__version__}: histogram postprocessor")
 
     # read configuration & set up transformations
     transformers = []

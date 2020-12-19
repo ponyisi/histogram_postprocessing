@@ -1,11 +1,12 @@
 import setuptools
+import histgrinder
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="histgrinder",
-    version="0.1.3",
+    version=histgrinder.__version__,
     author="Peter Onyisi",
     author_email="ponyisi@utexas.edu",
     description="Generic system to perform streaming transformations on histograms",
