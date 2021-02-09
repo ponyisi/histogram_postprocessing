@@ -158,7 +158,7 @@ class ROOTOutputModule(OutputModule):
         self._write()
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': # pragma: no test
     import sys
     if len(sys.argv) != 3:
         print("Provide two arguments (input and output files)")
