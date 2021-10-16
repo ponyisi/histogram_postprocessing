@@ -16,3 +16,5 @@ This is still very much early-release software, you can test it as follows (e.g.
 
 `python3 -m histgrinder.engine example.root example.root -c example.yaml --prefix prefix`
 * the transformation above will perform a number of operations on the histograms of the input file. For example, 20 different histogram divisions are configured with the first config block.
+
+This work was supported by the US Department of Energy, Office of Science, Office of High Energy Physics, under Award Number DE-SC0007890.
