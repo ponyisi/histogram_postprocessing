@@ -1,0 +1,41 @@
+# Separate blocks with ---
+---
+# This function takes the ratio of some histograms
+Input: [ 'prefix/gaussians/gaus_(?P<id0>[23])(?P<id>\d)', 'prefix/gaussians/gaus_5(?P<id>\d)' ]
+Output: [ 'prefix/gauDiv_{id0}{id}' ]
+Function: histgrinder.example.transform_function_divide_ROOT
+#Here is how you would pass parameters
+#Parameters: { variable: eta, binedges: [-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,2.5] }
+Description: Testing1
+---
+# This function sums the ratio of some histograms
+Input: [ 'prefix/gaussians/gaus_(?P<id0>\d)(?P<id>\d)', 'prefix/gaussians/gaus_(?P<id0>\d)(?P<id>\d)' ]
+Output: [ 'prefix/gauDiv2_{id0}' ]
+Function: histgrinder.example.transform_function_divide2_ROOT
+#Here is how you would pass parameters
+#Parameters: { variable: eta, binedges: [-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,2.5] }
+Description: Testing2
+---
+# This function combines multiple histograms into one
+Input: [ 'prefix/gaussians/gaus_(?P<id>\d+)' ]
+Output: [ 'prefix/gauRMS' ]
+Function: histgrinder.example.transform_function_rms_ROOT
+#Here is how you would pass parameters
+#Parameters: { variable: eta, binedges: [-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,2.5] }
+Description: Testing3
+---
+# This function takes the ratio of one pair of histograms
+Input: [ 'prefix/gaussians/gaus_72', 'prefix/gaussians/gaus_18' ]
+Output: [ 'prefix/gauDivSpecial' ]
+Function: histgrinder.example.transform_function_divide_ROOT
+#Here is how you would pass parameters
+#Parameters: { variable: eta, binedges: [-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,2.5] }
+Description: Testing4
+---
+# This function takes the ratio of one pair of histograms, but reversed from above
+Input: [ 'prefix/gaussians/gaus_18', 'prefix/gaussians/gaus_72' ]
+Output: [ 'prefix/gauDivSpecialInv' ]
+Function: histgrinder.example.transform_function_divide_ROOT
+#Here is how you would pass parameters
+#Parameters: { variable: eta, binedges: [-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,2.5] }
+Description: Testing5

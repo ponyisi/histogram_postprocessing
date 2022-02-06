@@ -1,0 +1,6 @@
+---
+# Function returns a type not handled by histgrinder
+Input: [ 'gaussians/gaus_(?P<id0>[23])(?P<id>\d)', 'gaussians/gaus_5(?P<id>\d)' ]
+Output: [ 'gauDiv_{id0}{id}' ]
+Function: tests.test_run.returncppstr
+Description: Testing1

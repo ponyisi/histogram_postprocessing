@@ -47,9 +47,7 @@ class ROOTInputModule(InputModule):
         import os.path
         from collections import deque
         log = logging.getLogger(__name__)
-        infile = ROOT.TFile.Open(self.source)
-        if not infile:
-            raise ValueError(f"Unable to open input file {self.source}")
+        infile = ROOT.TFile.Open(self.source)  # failure to open will raise OSError
         dirqueue = deque([''])
         while dirqueue:
             dirname = dirqueue.popleft()
@@ -111,7 +109,7 @@ class ROOTOutputModule(OutputModule):
         """
         if 'target' not in options:
             raise ValueError("Must specify 'target' as an option "
-                             "to ROOTInputModule")
+                             "to ROOTOutputModule")
         self.target = options['target']
         self.overwrite = bool(options.get('overwrite', True))
         self.prefix = options.get('prefix', '/')
@@ -158,7 +156,7 @@ class ROOTOutputModule(OutputModule):
         self._write()
 
 
-if __name__ == '__main__': # pragma: no test
+if __name__ == '__main__':  # pragma: no cover
     import sys
     if len(sys.argv) != 3:
         print("Provide two arguments (input and output files)")

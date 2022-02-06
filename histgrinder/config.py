@@ -1,10 +1,10 @@
 # Configuration utilities
-from typing import Union, IO, List, Any
+from typing import Union, IO, List, Any, Mapping
 import logging
 
 
 class TransformationConfiguration(object):
-    def __init__(self, Input, Output, Function, Description, Parameters={}):
+    def __init__(self, Input: List[str], Output: List[str], Function: str, Description: str, Parameters: Mapping = {}):
         self.input = Input
         self.output = Output
         self.function = Function
@@ -20,7 +20,7 @@ class TransformationConfiguration(object):
 def read_configuration(f: Union[str, IO]) -> List[TransformationConfiguration]:
     import yaml
     if isinstance(f, str):
-        fobj = open(f)
+        fobj = open(f, 'r')
     else:
         fobj = f
 
@@ -38,11 +38,11 @@ def read_configuration(f: Union[str, IO]) -> List[TransformationConfiguration]:
 
 def lookup_name(name: str) -> Any:
     import importlib
-    name = name.rsplit('.', 1)
-    return getattr(importlib.import_module(name[0]), name[1])
+    spname = name.rsplit('.', 1)
+    return getattr(importlib.import_module(spname[0]), spname[1])
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     import sys
     for _ in read_configuration(sys.argv[1]):
         print(_)
