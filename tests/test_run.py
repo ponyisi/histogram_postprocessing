@@ -41,10 +41,13 @@ def test_run_newfile():
     pytest.importorskip("ROOT")
 
     import subprocess
+    import os.path
     chk = subprocess.run("python -m histgrinder.make_sample_file",
                          shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     print(chk.stdout)
     chk.check_returncode()
+    if os.path.exists('new.root'):
+        os.remove('new.root')
     chk = subprocess.run("python -m histgrinder.engine example.root new.root -c tests/test_functional.yaml --prefix prefix",
                          shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     print(chk.stdout)
@@ -73,17 +76,20 @@ def test_run_absprefix():
     pytest.importorskip("ROOT")
 
     import subprocess
+    import os.path
     chk = subprocess.run("python -m histgrinder.make_sample_file",
                          shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     print(chk.stdout)
     chk.check_returncode()
-    chk = subprocess.run("python -m histgrinder.engine example.root example.root "
+    if os.path.exists('new.root'):
+        os.remove('new.root')
+    chk = subprocess.run("python -m histgrinder.engine example.root new.root "
                          "-c tests/test_functional.yaml --prefix /prefix",
                          shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     print(chk.stdout)
     chk.check_returncode()
 
-    return content_verify()
+    return content_verify(newfile=True)
 
 
 def test_run_defer():
@@ -176,20 +182,6 @@ def test_run_bad_prefix():
                          shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     print(chk.stdout)
     assert b'Access to invalid directory' in chk.stdout
-    chk.check_returncode()
-
-
-def test_run_nocode():
-    pytest.importorskip("ROOT")
-
-    import subprocess
-    chk = subprocess.run("python -m histgrinder.make_sample_file",
-                         shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    print(chk.stdout)
-    chk.check_returncode()
-    chk = subprocess.run("python -m histgrinder.engine example.root example.root -c tests/test_empty.yaml --prefix /prefix",
-                         shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    print(chk.stdout)
     chk.check_returncode()
 
 

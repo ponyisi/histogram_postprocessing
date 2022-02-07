@@ -18,6 +18,17 @@ def test_rootio():
     rom.configure({'target': ''})
     rom.finalize()
 
+    # this is also for coverage completeness (see that we get everything if no selector is set for the input module)
+    import subprocess
+    chk = subprocess.run("python -m histgrinder.make_sample_file",
+                         shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    print(chk.stdout)
+    chk.check_returncode()
+
+    rim.configure({'source': 'example.root'})
+    inputs = list(rim.iterate(dryrun=True))
+    assert len(inputs) == 101
+
 
 def test_badconfig():
     from histgrinder.config import read_configuration
