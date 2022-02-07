@@ -1,13 +1,14 @@
 from .config import TransformationConfiguration, lookup_name
 from .HistObject import HistObject
-from typing import Optional, List
+from typing import DefaultDict, Optional, List, Tuple, Match, Dict
+import re
 
 
 class Transformer(object):
     def __init__(self, tc: TransformationConfiguration):
-        import re
         import string
         self.tc = tc
+        self.matchqueue = set()
         # the number of histograms needed for a match
         self.inlength = len(tc.input)
         # regexes of input
@@ -26,7 +27,7 @@ class Transformer(object):
                                          for output in self.tc.output])
 
         # one dictionary for each input slot
-        self.hits = [{} for _ in range(len(self.inregexes))]
+        self.hits: List[Dict[Tuple[str], HistObject]] = [{} for _ in range(len(self.inregexes))]
         try:
             self.transform_function = lookup_name(tc.function)
             if not callable(self.transform_function):
@@ -35,7 +36,7 @@ class Transformer(object):
         except Exception as e:
             raise ValueError(f"Unable to instantiate transformer because: {e}")
 
-    def consider(self, obj: HistObject, dryrun: bool = False) -> Optional[List[HistObject]]:
+    def consider(self, obj: HistObject, defer: bool = False) -> Optional[List[HistObject]]:
         """ Emit a new plot if we get a full match, otherwise None """
         import logging
         log = logging.getLogger(__name__)
@@ -48,27 +49,41 @@ class Transformer(object):
                 match = imatch
         if match is None:
             return None
+
+        self.matchqueue.add(match)
+        if defer:
+            return None
+        return self.transform()
+
+    def transform(self) -> List[HistObject]:
         # Return value list
         rv = []
 
-        # Given a match, what first position histograms are relevant?
-        firstmatches = self._getMatchingFirstHists(match)
+        firstmatchset = set()
+        for match in self.matchqueue:
+            # Given a match, what first position histograms are relevant?
+            firstmatches = self._getMatchingFirstHists(match)
+            firstmatchset.add(tuple(firstmatches))
 
-        # Group the first position matches by integration variables
-        groupedfirstmatches = self._groupMatches(firstmatches)
+        for firstmatches in firstmatchset:
+            # Group the first position matches by integration variables
+            groupedfirstmatches = self._groupMatches(firstmatches)
 
-        # construct iterables & call functions
-        for tuplist in groupedfirstmatches.values():
-            hci = HistCombinationIterable(self, tuplist)
-            if _fullyvalid(hci):
-                olist = self.transform_function(hci, **self.tc.parameters)
-                for i, ohist in enumerate(olist):
-                    oname = self.tc.output[i].format(**dict(zip(self.regextupnames[0], tuplist[0])))
-                    rv.append(HistObject(oname, ohist))
-
+            # construct iterables & call functions
+            for tuplist in groupedfirstmatches.values():
+                hci = HistCombinationIterable(self, tuplist)
+                if _fullyvalid(hci):
+                    olist = self.transform_function(hci, **self.tc.parameters)
+                    if len(olist) != len(self.tc.output):
+                        raise ValueError(f'Function {self.tc.function} gave {len(olist)} return values '
+                                         f'but the YAML configuration specifies {len(self.tc.output)}.')
+                    for i, ohist in enumerate(olist):
+                        oname = self.tc.output[i].format(**dict(zip(self.regextupnames[0], tuplist[0])))
+                        rv.append(HistObject(oname, ohist))
+        self.matchqueue.clear()
         return rv
 
-    def _getMatchingFirstHists(self, match):
+    def _getMatchingFirstHists(self, match: Match) -> List[Tuple[str]]:
         firstmatches = []
         for tup in self.hits[0]:
             # does the tuple match in all spots where the pattern name matches, and
@@ -80,7 +95,7 @@ class Transformer(object):
                 firstmatches.append(tup)
         return firstmatches
 
-    def _groupMatches(self, firstmatches):
+    def _groupMatches(self, firstmatches: List[Tuple[str]]) -> DefaultDict[Tuple[str], List[Tuple[str]]]:
         # group matches by self.outputnames
         import collections
         rv = collections.defaultdict(list)

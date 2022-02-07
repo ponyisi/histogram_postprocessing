@@ -1,0 +1,6 @@
+---
+# Function has wrong number of return arguments
+Input: [ 'gaussians/gaus_(?P<id0>[23])(?P<id>\d)', 'gaussians/gaus_5(?P<id>\d)' ]
+Output: [ 'gauDiv_{id0}{id}' ]
+Function: histgrinder.example.nop
+Description: Testing1

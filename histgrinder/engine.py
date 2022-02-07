@@ -26,6 +26,8 @@ def go():
                         choices=['DEBUG', 'INFO', 'WARNING',
                                  'ERROR', 'CRITICAL'],
                         default='INFO')
+    parser.add_argument('--defer', action='store_true', help='Defer processing of histograms until end of input loop')
+    parser.add_argument('--delaywrite', action='store_true', help='Write histograms at once at end of job')
     args = parser.parse_args()
 
     logging.basicConfig(level=args.loglevel,
@@ -52,7 +54,7 @@ def go():
 
     # Configure output
     om = lookup_name(args.outmodule)()
-    out_configuration = {'target': args.target}
+    out_configuration = {'target': args.target, 'delay': args.delaywrite}
     if args.prefix:
         out_configuration['prefix'] = args.prefix
     om.configure(out_configuration)
@@ -61,18 +63,31 @@ def go():
     log.info("Warmup")
     for obj in im.warmup():
         for _ in transformers:
-            v = _.consider(obj)
+            _.consider(obj)
 
-    # Event loop
     log.info("Beginning loop")
-    for obj in im:
-        for _ in transformers:
-            v = _.consider(obj)
-            if v:
-                om.publish(v)
-
+    eventloop(im, om, transformers, args, log)
     log.info("Complete")
 
 
-if __name__ == '__main__':
+def eventloop(im, om, transformers, args, log):
+    # Event loop
+    for obj in im:
+        for _ in transformers:
+            v = _.consider(obj, defer=args.defer)
+            if v:
+                om.publish(v)
+    if args.defer:
+        log.info("Processing deferred results")
+        for _ in transformers:
+            lv = _.transform()
+            for v in lv:
+                om.publish(v)
+
+    if args.delaywrite:
+        log.info("Finalizing output")
+        om.finalize()
+
+
+if __name__ == '__main__':  # pragma: no cover
     go()

@@ -22,6 +22,6 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
     install_requires=['PyYAML>=5'],
-    tests_requires=['pytest','pytest-cov'],
+    tests_requires=['pytest', 'pytest-cov'],
     scripts=['bin/histgrinder']
 )
