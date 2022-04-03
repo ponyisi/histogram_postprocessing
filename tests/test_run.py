@@ -234,6 +234,8 @@ def test_run_fullmatch():
     f = ROOT.TFile.Open("new.root")
     d = f.Get('prefix')
     assert d
-    # correct size? Should only be 10, not 100!
+    # correct size? Should only be 10!
     assert f.Get("prefix/gauRMS").GetEntries() == 10
+    # correct mean? If we're combining the wrong values, mean will be wrong!
+    assert pytest.approx(f.Get("prefix/gauRMS").GetMean(), 1e-8) == 0.9992461958826633
     return True
