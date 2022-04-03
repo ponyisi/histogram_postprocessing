@@ -69,7 +69,7 @@ class ROOTInputModule(InputModule):
                     continue
                 objname = os.path.join(dirname, k.GetName())
                 if self.selectors is not None:
-                    if not any(_.match(objname) for _ in self.selectors):
+                    if not any(_.fullmatch(objname) for _ in self.selectors):
                         continue
                 obj = readobj(k, dryrun)
                 log.debug('ROOT input read '
