@@ -1,0 +1,10 @@
+# Separate blocks with ---
+---
+
+# This function combines multiple histograms into one
+Input: [ 'gaussians/gaus_(?P<id>\d)' ]
+Output: [ 'gauRMS' ]
+Function: histgrinder.example.transform_function_rms_ROOT
+#Here is how you would pass parameters
+#Parameters: { variable: eta, binedges: [-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,2.5] }
+Description: Testing3
