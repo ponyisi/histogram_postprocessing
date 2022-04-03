@@ -214,3 +214,28 @@ def test_run_badreturn():
     assert b'Function histgrinder.example.nop gave 0 return values but the YAML configuration specifies 1' in chk.stdout
     with pytest.raises(CalledProcessError):
         chk.check_returncode()
+
+
+def test_run_fullmatch():
+    ROOT = pytest.importorskip("ROOT")
+
+    import subprocess
+    chk = subprocess.run("python -m histgrinder.make_sample_file",
+                         shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    print(chk.stdout)
+    chk.check_returncode()
+    chk = subprocess.run("python -m histgrinder.engine example.root new.root "
+                         "-c tests/test_fullmatch.yaml --prefix prefix",
+                         shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    print(chk.stdout)
+    chk.check_returncode()
+
+    # verify output
+    f = ROOT.TFile.Open("new.root")
+    d = f.Get('prefix')
+    assert d
+    # correct size? Should only be 10!
+    assert f.Get("prefix/gauRMS").GetEntries() == 10
+    # correct mean? If we're combining the wrong values, mean will be wrong!
+    assert pytest.approx(f.Get("prefix/gauRMS").GetMean(), 1e-8) == 0.9992461958826633
+    return True

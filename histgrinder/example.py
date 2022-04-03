@@ -26,7 +26,7 @@ def transform_function_divide2_ROOT(inputs):
 
 
 def transform_function_rms_ROOT(inputs):
-    """ This function returns the ratio of two ROOT histograms """
+    """ This function plots the RMSes of a list of ROOT histograms """
     import ROOT
     rv = ROOT.TH1F('RMS', 'RMS of gaussians', 40, 0, 2)
     plots = [_[1][0] for _ in inputs]  # all plots passed as first element of list

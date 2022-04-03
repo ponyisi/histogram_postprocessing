@@ -43,7 +43,7 @@ class Transformer(object):
         log.debug(self.tc.description)
         match = None
         for ire, regex in enumerate(self.inregexes):
-            imatch = regex.match(obj.name)
+            imatch = regex.fullmatch(obj.name)
             if imatch:
                 self.hits[ire][imatch.groups()] = obj
                 match = imatch
