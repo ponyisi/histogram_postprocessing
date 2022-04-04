@@ -1,6 +1,6 @@
 from .config import TransformationConfiguration, lookup_name
 from .HistObject import HistObject
-from typing import DefaultDict, Optional, List, Tuple, Match, Dict
+from typing import DefaultDict, Mapping, Optional, List, Tuple, Match, Dict
 import re
 
 
@@ -23,8 +23,11 @@ class Transformer(object):
         self.regextupnames = [tuple(_) for _ in self.regexgroups]
 
         # group names that appear in outputs
-        self.outputnames = set().union(*[[_[1] for _ in string.Formatter().parse(output)]
-                                         for output in self.tc.output])
+        if self.tc.variable_output:
+            self.outputnames = self.tc.output_dof
+        else:
+            self.outputnames = set().union(*[[_[1] for _ in string.Formatter().parse(output)]
+                                             for output in self.tc.output])
 
         # one dictionary for each input slot
         self.hits: List[Dict[Tuple[str], HistObject]] = [{} for _ in range(len(self.inregexes))]
@@ -74,11 +77,22 @@ class Transformer(object):
                 hci = HistCombinationIterable(self, tuplist)
                 if _fullyvalid(hci):
                     olist = self.transform_function(hci, **self.tc.parameters)
-                    if len(olist) != len(self.tc.output):
-                        raise ValueError(f'Function {self.tc.function} gave {len(olist)} return values '
-                                         f'but the YAML configuration specifies {len(self.tc.output)}.')
-                    for i, ohist in enumerate(olist):
-                        oname = self.tc.output[i].format(**dict(zip(self.regextupnames[0], tuplist[0])))
+                    if self.tc.variable_output:
+                        # olist must be a mapping
+                        if not isinstance(olist, Mapping):
+                           raise ValueError(f'Function {self.tc.function} gave a return value which is not a Mapping '
+                                            f'but VariableOutput functions must do so.')
+                        if any(not isinstance(_, str) for _ in olist.keys()):
+                            raise ValueError(f'Function {self.tc.function} gave a return value Mapping where at least one of '
+                                             f'the keys is not a string.')
+                        itrview = olist.items()
+                    else:
+                        if len(olist) != len(self.tc.output):
+                            raise ValueError(f'Function {self.tc.function} gave {len(olist)} return values '
+                                             f'but the YAML configuration specifies {len(self.tc.output)}.')
+                        itrview = zip(self.tc.output, olist)
+                    for foname, ohist in itrview:
+                        oname = foname.format(**dict(zip(self.regextupnames[0], tuplist[0])))
                         rv.append(HistObject(oname, ohist))
         self.matchqueue.clear()
         return rv

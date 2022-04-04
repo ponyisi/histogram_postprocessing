@@ -44,9 +44,43 @@ def test_read_config_from_filelike_object():
 Input: ['gaussians/gaus_(?P<id0>[23])(?P<id>\\d)', 'gaussians/gaus_5(?P<id>\\d)']
 Output: ['gauDiv_{id0}{id}']
 Function: histgrinder.example.transform_function_divide_ROOT, Parameters: {}""")
+    assert (repr(c[2]) == r"""Description: Testing3
+Input: ['gaussians/gaus_(?P<id0>\\d)(?P<id>\\d)', 'gaussians/gaus_(?P<id0>\\d)(?P<id>\\d)']
+VariableOutput: True, OutputDOF: ['id0']
+Function: histgrinder.example.transform_function_divide2_ROOT_naming, Parameters: {'pattern': 'gauDiv3_{id0}'}""")
 
 
 def test_read_nonexistent_config():
     from histgrinder.config import read_configuration
     with pytest.raises(FileNotFoundError):
         read_configuration('tests/missing.yaml')
+
+
+def test_clash_variableoutput():
+    import histgrinder.config
+    from histgrinder.config import read_configuration
+    import io
+
+    print(histgrinder.config)
+    # Can't specify OutputDOF without VariableOutput
+    f = io.StringIO(r"""
+---
+Input: [ 'gaussians/gaus_(?P<id0>\d)(?P<id>\d)', 'gaussians/gaus_(?P<id0>\d)(?P<id>\d)' ]
+OutputDOF: [ 'id0' ]
+Function: afunction
+Description: Test
+    """)
+    with pytest.raises(ValueError):
+        read_configuration(f)
+
+    # Can't specify Output and VariableOutput
+    f = io.StringIO(r"""
+---
+Input: [ 'gaussians/gaus_(?P<id0>\d)(?P<id>\d)', 'gaussians/gaus_(?P<id0>\d)(?P<id>\d)' ]
+Output: [ 'gauDiv_{id0}' ]
+VariableOutput: True
+Function: afunction
+Description: Test
+    """)
+    with pytest.raises(ValueError):
+        read_configuration(f)

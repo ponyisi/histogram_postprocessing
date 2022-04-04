@@ -9,7 +9,7 @@ def content_verify(newfile=False):
     f = ROOT.TFile.Open("new.root" if newfile else "example.root")
     d = f.Get('prefix')
     # did we create new histograms?
-    assert len(d.GetListOfKeys()) == (32 if newfile else 33)
+    assert len(d.GetListOfKeys()) == (41 if newfile else 42)
     # correct size?
     assert f.Get("prefix/gauRMS").GetEntries() == 100
     return True
@@ -239,3 +239,53 @@ def test_run_fullmatch():
     # correct mean? If we're combining the wrong values, mean will be wrong!
     assert pytest.approx(f.Get("prefix/gauRMS").GetMean(), 1e-8) == 0.9992461958826633
     return True
+
+
+def test_run_bad_variableoutput():
+    pytest.importorskip("ROOT")
+    import tempfile
+
+    import subprocess
+    chk = subprocess.run("python -m histgrinder.make_sample_file",
+                         shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    print(chk.stdout)
+    chk.check_returncode()
+
+    # Test that we get the correct type of return value from function
+    with tempfile.NamedTemporaryFile() as configfile:
+        configfile.write(
+            rb"""---
+Input: [ 'gaussians/gaus_(?P<id0>[23])(?P<id>\d)', 'gaussians/gaus_5(?P<id>\d)' ]
+OutputDOF: [ 'id0', 'id' ]
+VariableOutput: True
+Function: histgrinder.example.transform_function_divide_ROOT
+Description: Testing
+            """
+        )
+        configfile.flush()
+        chk = subprocess.run(f"python -m histgrinder.engine example.root example.root -c {configfile.name} --prefix prefix",
+                            shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        print(chk.stdout)
+        assert b'Function histgrinder.example.transform_function_divide_ROOT gave a return value which is not a Mapping but VariableOutput functions must do so.' in chk.stdout
+        with pytest.raises(CalledProcessError):
+            chk.check_returncode()
+
+    # Test that we have the correct kind of keys: here, return an integer
+    with tempfile.NamedTemporaryFile() as configfile:
+        configfile.write(
+            rb"""---
+Input: [ 'gaussians/gaus_(?P<id0>\d)(?P<id>\d)', 'gaussians/gaus_(?P<id0>\d)(?P<id>\d)' ]
+OutputDOF: [ 'id0' ]
+VariableOutput: True
+Function: histgrinder.example.transform_function_divide2_ROOT_naming
+Parameters: { pattern: 57 }
+Description: Testing
+            """
+        )
+        configfile.flush()
+        chk = subprocess.run(f"python -m histgrinder.engine example.root example.root -c {configfile.name} --prefix prefix",
+                            shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        print(chk.stdout)
+        assert b'Function histgrinder.example.transform_function_divide2_ROOT_naming gave a return value Mapping where at least one of the keys is not a string.' in chk.stdout
+        with pytest.raises(CalledProcessError):
+            chk.check_returncode()

@@ -16,13 +16,22 @@ Function: histgrinder.example.transform_function_divide2_ROOT
 #Parameters: { variable: eta, binedges: [-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,2.5] }
 Description: Testing2
 ---
+# This function is like above but we determine the name of the output in the function
+Input: [ 'prefix/gaussians/gaus_(?P<id0>\d)(?P<id>\d)', 'prefix/gaussians/gaus_(?P<id0>\d)(?P<id>\d)' ]
+OutputDOF: [ 'id0' ]
+VariableOutput: True
+Function: histgrinder.example.transform_function_divide2_ROOT_naming
+#Pass a parameter
+Parameters: { pattern: 'prefix/gauDiv3_{id0}' }
+Description: Testing3
+---
 # This function combines multiple histograms into one
 Input: [ 'prefix/gaussians/gaus_(?P<id>\d+)' ]
 Output: [ 'prefix/gauRMS' ]
 Function: histgrinder.example.transform_function_rms_ROOT
 #Here is how you would pass parameters
 #Parameters: { variable: eta, binedges: [-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,2.5] }
-Description: Testing3
+Description: Testing4
 ---
 # This function takes the ratio of one pair of histograms
 Input: [ 'prefix/gaussians/gaus_72', 'prefix/gaussians/gaus_18' ]
@@ -30,7 +39,7 @@ Output: [ 'prefix/gauDivSpecial' ]
 Function: histgrinder.example.transform_function_divide_ROOT
 #Here is how you would pass parameters
 #Parameters: { variable: eta, binedges: [-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,2.5] }
-Description: Testing4
+Description: Testing5
 ---
 # This function takes the ratio of one pair of histograms, but reversed from above
 Input: [ 'prefix/gaussians/gaus_18', 'prefix/gaussians/gaus_72' ]
@@ -38,4 +47,12 @@ Output: [ 'prefix/gauDivSpecialInv' ]
 Function: histgrinder.example.transform_function_divide_ROOT
 #Here is how you would pass parameters
 #Parameters: { variable: eta, binedges: [-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,2.5] }
-Description: Testing5
+Description: Testing6
+---
+# This function does nothing
+Input: [ 'prefix/gaussians/graph' ]
+Output: [ ]
+Function: histgrinder.example.nop
+#Here is how you would pass parameters
+#Parameters: { variable: eta, binedges: [-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,2.5] }
+Description: Testing7

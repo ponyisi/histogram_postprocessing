@@ -4,17 +4,30 @@ import logging
 
 
 class TransformationConfiguration(object):
-    def __init__(self, Input: List[str], Output: List[str], Function: str, Description: str, Parameters: Mapping = {}):
+    def __init__(self, Input: List[str], Function: str, Description: str, Output: List[str] = [], VariableOutput: bool = False, OutputDOF: List[str] = [], Parameters: Mapping[str, Any] = {}):
         self.input = Input
         self.output = Output
         self.function = Function
         self.parameters = Parameters
         self.description = Description
+        self.variable_output = VariableOutput
+        self.output_dof = OutputDOF
+
+        # check for conflicting options
+        if OutputDOF and not VariableOutput:
+            raise ValueError('Cannot specify OutputDOF if not also setting VariableOutput: True.')
+        if Output and VariableOutput:
+            raise ValueError('Cannot specify Output if VariableOutput == True.')
 
     def __repr__(self):
-        return (f"Description: {self.description}\nInput: {self.input}\n"
-                f"Output: {self.output}\n"
-                f"Function: {self.function}, Parameters: {self.parameters}")
+        if self.variable_output:
+            return (f"Description: {self.description}\nInput: {self.input}\n"
+                    f"VariableOutput: True, OutputDOF: {self.output_dof}\n"
+                    f"Function: {self.function}, Parameters: {self.parameters}")
+        else:
+            return (f"Description: {self.description}\nInput: {self.input}\n"
+                    f"Output: {self.output}\n"
+                    f"Function: {self.function}, Parameters: {self.parameters}")
 
 
 def read_configuration(f: Union[str, IO]) -> List[TransformationConfiguration]:
