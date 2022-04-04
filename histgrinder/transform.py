@@ -80,8 +80,8 @@ class Transformer(object):
                     if self.tc.variable_output:
                         # olist must be a mapping
                         if not isinstance(olist, Mapping):
-                           raise ValueError(f'Function {self.tc.function} gave a return value which is not a Mapping '
-                                            f'but VariableOutput functions must do so.')
+                            raise ValueError(f'Function {self.tc.function} gave a return value which is not a Mapping '
+                                             f'but VariableOutput functions must do so.')
                         if any(not isinstance(_, str) for _ in olist.keys()):
                             raise ValueError(f'Function {self.tc.function} gave a return value Mapping where at least one of '
                                              f'the keys is not a string.')

@@ -53,7 +53,7 @@ def nop(inputs):
     return []
 
 
-def nop_var(inputs):
+def nop_var(inputs):  # pragma: no cover
     """ This function does nothing but may be useful for debugging """
     print(list(inputs))
     return {}
