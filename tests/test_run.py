@@ -285,7 +285,7 @@ Description: Testing
         )
         configfile.flush()
         chk = subprocess.run(f"python -m histgrinder.engine example.root example.root -c {configfile.name} --prefix prefix",
-                            shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                             shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         print(chk.stdout)
         assert (b'Function histgrinder.example.transform_function_divide2_ROOT_naming gave a return value'
                 b' Mapping where at least one of the keys is not a string.' in chk.stdout)

@@ -4,7 +4,7 @@ import logging
 
 
 class TransformationConfiguration(object):
-    def __init__(self, Input: List[str], Function: str, Description: str, Output: List[str] = [], 
+    def __init__(self, Input: List[str], Function: str, Description: str, Output: List[str] = [],
                  VariableOutput: bool = False, OutputDOF: List[str] = [], Parameters: Mapping[str, Any] = {}):
         self.input = Input
         self.output = Output
