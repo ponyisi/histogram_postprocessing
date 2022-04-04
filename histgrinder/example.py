@@ -25,6 +25,18 @@ def transform_function_divide2_ROOT(inputs):
     return [cl]
 
 
+def transform_function_divide2_ROOT_naming(inputs, pattern):
+    """ This function returns the ratio of two ROOT histograms """
+    assert len(inputs) == 10
+    cl = inputs[0][1][0].Clone()
+    cl.Clear()
+    for o in inputs:
+        cl2 = o[1][0].Clone()
+        cl2.Divide(o[1][1])
+        cl.Add(cl2)
+    return {pattern: cl}
+
+
 def transform_function_rms_ROOT(inputs):
     """ This function plots the RMSes of a list of ROOT histograms """
     import ROOT
@@ -39,3 +51,9 @@ def nop(inputs):
     """ This function does nothing but may be useful for debugging """
     print(list(inputs))
     return []
+
+
+def nop_var(inputs):  # pragma: no cover
+    """ This function does nothing but may be useful for debugging """
+    print(list(inputs))
+    return {}
