@@ -48,7 +48,7 @@ class Transformer(object):
         for ire, regex in enumerate(self.inregexes):
             imatch = regex.fullmatch(obj.name)
             if imatch:
-                self.hits[ire][imatch.groups()] = obj
+                self.hits[ire][tuple(imatch.groupdict().values())] = obj
                 match = imatch
         if match is None:
             return None
