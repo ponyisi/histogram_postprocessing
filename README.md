@@ -9,7 +9,7 @@ Features:
 
 This is still very much early-release software, you can test it as follows (e.g. should work on lxplus, if you have a CERN account):
 * set up ROOT and Python (>=3.7) in a way that you like. For ATLAS people you can set up a master nightly. (The code may run on Python 3.6 but we no longer test it there.)
-* install (not needed if you are on ATLAS and using master,2020-10-20T2101 or later): `python3 -m pip install -U --user histgrinder==0.1.5`
+* install (not needed if you are on ATLAS and using master,2020-10-20T2101 or later): `python3 -m pip install -U --user histgrinder==0.1.6`
 * prepare a sample ROOT file: `python3 -m histgrinder.make_sample_file`
 * download an example YAML configuration from https://raw.githubusercontent.com/ponyisi/histogram_postprocessing/master/resources/example.yaml 
 * run. The following will postprocess `example.root`, created above, according to the `example.yaml` configuration, ignoring the top-level path "prefix", then add the outputs to `example.root`: 
